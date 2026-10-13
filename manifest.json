@@ -1,0 +1,20 @@
+{
+  "name": "Mizu Extension",
+  "description": "Shizukuの欲しい機能をまとめたやつ",
+  "version": "1.0.0",
+  "manifest_version": 3,
+  "permissions": [
+    "sidePanel",
+    "storage"
+  ],
+  "action": {
+    "default_title": "コンパクト設定を開く",
+    "default_popup": "popup.html"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}
