@@ -16,5 +16,15 @@
   },
   "background": {
     "service_worker": "background.js"
-  }
+  },
+  "author": {
+    "email": "mochimizu@suitomisu.com"
+  },
+  "short_name": "MizuX",
+  "content_scripts": [
+    {
+      "matches": [ "https://*.gigafile.nu/*", "https://gigafile.nu/" ],
+      "js": [ "gigafile.js" ]
+    }
+  ]
 }
