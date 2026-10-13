@@ -1,11 +1,17 @@
+(async () =>{
 /**
  * 
  * アップロード時のリンクコピーボタン
  * 
  */
 if (location.href == 'https://gigafile.nu/') {
+    const settings = await chrome.storage.local.get({
+            gigafileCopy: true,
+            gigafileDelKey: false
+        });
     const targetNode = document.getElementById("file_list")
     const callback = async (mutationsList, observer) => {
+        if(!settings.gigafileCopy) return;
         for (const mutation of mutationsList) {
             if (mutation.type === 'childList') {
                 for (const ednode of mutation.addedNodes) {
@@ -19,7 +25,14 @@ if (location.href == 'https://gigafile.nu/') {
                     await waitForDisplayInline(aTag);
 
                     // 出力
-                    const url = aTag.getAttribute('href') + "?deleteKey=" + delKey.getAttribute('origin');
+                    // const url = aTag.getAttribute('href') + "?deleteKey=" + delKey.getAttribute('origin');
+                    const url = function() {
+                        if(settings.gigafileDelKey){
+                            return aTag.getAttribute('href') + "?deleteKey=" + delKey.getAttribute('origin')
+                        }else {
+                            return aTag.getAttribute('href')
+                        }
+                    }();
 
                     if (!ednode.querySelector('.custom-copy-btn')) {
                         addButton(ednode, url);
@@ -83,3 +96,5 @@ if (location.href == 'https://gigafile.nu/') {
     let inputDelKey = document.getElementById("delkey");
     inputDelKey.value = delKey[1]
 }
+
+})();

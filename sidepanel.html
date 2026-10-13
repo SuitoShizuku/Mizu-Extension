@@ -3,54 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <style>
-    body {
-      font-family: sans-serif;
-      margin: 0;
-      padding: 0;
-      color: #fff;
-      background-color: #000e1c;
-    }
-
-    header {
-      background-color: #fe3030;
-      font-size: 15px;
-      margin: 0;
-      z-index: 1000;
-      position: fixed;
-      width: 100%;
-      transition: opacity 0.5s ease;
-    }
-    header.nofHide {
-      opacity: 0;
-      pointer-events: none;
-    }
-    header.nofShow {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    #notification {
-      /* margin: 16px; */
-      padding: 8px 16px;
-    }
-
-    main {
-      padding: 16px;
-    }
-    
-    button {
-      margin-top: 16px;
-      width: 100%;
-      padding: 8px;
-      cursor: pointer;
-      background-color: #ffffff30;
-      border-width: 0;
-      border-radius: 5px;
-      color: #fff;
-      font-weight: bold;
-      user-select: none;
-    }
-  </style>
+  <link rel="stylesheet" href="sidepanel.css">
 </head>
 
 <body>
@@ -65,6 +18,22 @@
   <main>
     <h2 style="margin-top: 0;">フル設定</h2>
     <p>ここに詳細な設定項目を配置します。</p>
+    <hr>
+    <h2>GigaFile便</h2>
+    <div>
+      <label class="toggle">
+        <input type="checkbox" id="gfCopy" checked>
+        <span class="slider"></span>
+      </label>
+      アップロード時にリンクのコピーボタンを付ける。
+    </div>
+    <div>
+      <label class="toggle">
+        <input type="checkbox" id="gfDelKey">
+        <span class="slider"></span>
+      </label>
+      コピーボタンからのコピー時、削除キーも付属させる。
+    </div>
     <hr>
     <button id="initializeCache">拡張機能のキャッシュ・データを削除</button>
   </main>
