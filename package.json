@@ -1,0 +1,23 @@
+{
+  "name": "mizu-extension",
+  "version": "1.0.0",
+  "description": "しずくの必要な機能を集めた拡張機能",
+  "main": "background.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SuitoShizuku/Mizu-Extension.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SuitoShizuku/Mizu-Extension/issues"
+  },
+  "homepage": "https://github.com/SuitoShizuku/Mizu-Extension#readme",
+  "devDependencies": {
+    "@types/chrome": "^0.3.5"
+  }
+}
