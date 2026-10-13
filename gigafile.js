@@ -8,25 +8,23 @@ if (location.href == 'https://gigafile.nu/') {
     const callback = async (mutationsList, observer) => {
         for (const mutation of mutationsList) {
             if (mutation.type === 'childList') {
-                console.log('子要素が追加または削除されました:', mutation.addedNodes);
-                console.log(mutation)
-                /**@type {HTMLElement} */
-                const ednode = mutation.addedNodes.item(0)
-                const nodes = ednode.getElementsByTagName("div").item(2)
-                // console.log(nodes)
-                const aTag = nodes.querySelector('a.file_info_url')
-                const delKey = nodes.getElementsByTagName('span').item(0).querySelector('input.delkey')
-                //ここでaTagのstyleのdisplayがinlineになるまで待つ
-                await waitForDisplayInline(aTag);
-                // 出力
-                const url = aTag.getAttribute('href') + "?deleteKey=" + delKey.getAttribute('origin')
-                // console.log(url)
-                // ボタン追加
-                addButton(ednode, url)
-            } else if (mutation.type === 'characterData') {
-                console.log('テキスト内容が書き換えられました:', mutation.target.textContent);
-            } else if (mutation.type === 'attributes') {
-                console.log(`${mutation.attributeName} 属性が変更されました`);
+                for (const ednode of mutation.addedNodes) {
+                    if (!(ednode instanceof HTMLElement)) continue;
+                    const aTag = ednode.querySelector('a.file_info_url');
+                    const delKey = ednode.querySelector('input.delkey');
+
+                    if (!aTag || !delKey) continue;
+
+                    // ここでaTagのstyleのdisplayがinlineになるまで待つ
+                    await waitForDisplayInline(aTag);
+
+                    // 出力
+                    const url = aTag.getAttribute('href') + "?deleteKey=" + delKey.getAttribute('origin');
+
+                    if (!ednode.querySelector('.custom-copy-btn')) {
+                        addButton(ednode, url);
+                    }
+                }
             }
         }
     };
@@ -66,7 +64,9 @@ if (location.href == 'https://gigafile.nu/') {
      */
     function addButton(node, url) {
         const copyButton = document.createElement("button");
+        copyButton.className = "mizu-copy-btn";
         copyButton.textContent = "リンクをコピー";
+        copyButton.style.fontWeight = 'bold';
         copyButton.onclick = function () {
             navigator.clipboard.writeText(url);
         };
