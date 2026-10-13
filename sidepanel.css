@@ -37,6 +37,9 @@ main {
 div {
     margin-top: 8px;
 }
+a {
+    color: #88abc7;
+}
 button {
     margin-top: 16px;
     width: 100%;
