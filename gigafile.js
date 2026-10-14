@@ -96,5 +96,18 @@
         let inputDelKey = document.getElementById("delkey");
         inputDelKey.value = delKey[1]
     }
-
+    let sidepanelButton = document.createElement('button')
+    sidepanelButton.style.width = '468px';
+    sidepanelButton.style.height = '35px';
+    sidepanelButton.style.borderRadius = '5px';
+    sidepanelButton.style.borderWidth = '0';
+    sidepanelButton.style.backgroundColor = '#303b47';
+    sidepanelButton.style.color = '#fff';
+    sidepanelButton.style.fontWeight = 'bold';
+    sidepanelButton.style.margin = '16px 0';
+    sidepanelButton.textContent = "ファイルマネージャーを表示"
+    sidepanelButton.onclick = (event) => {
+        chrome.runtime.sendMessage({ action: 'openSidePanel' });
+    };
+    document.getElementById('contents_header').before(sidepanelButton)
 })();
