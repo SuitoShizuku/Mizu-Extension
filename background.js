@@ -1,9 +1,10 @@
-const PANEL_DEFAULT = '/sidepanel/default.html'
+// EDIT: パス定義を相対パスに統一
+const PANEL_DEFAULT = 'sidepanel/default.html'
 const PANEL_CONFIGS = [
   {
     name: 'GigaFile便',
     match: (url) => url.includes('gigafile.nu'),
-    path: '/sidepanel/gigafile.html'
+    path: 'sidepanel/gigafile.html'
 //   },
 //   {
 //     name: 'YouTube',
@@ -16,6 +17,9 @@ const PANEL_CONFIGS = [
 //     path: 'twitter_sidepanel.html'
   }
 ];
+
+// ADD: パス比較用の正規化関数
+const normalizePath = (path) => (path || '').replace(/^\//, '');
 
 /**
  * サイドパネルをURLによって切り替える関数
@@ -35,7 +39,8 @@ async function updateSidePanel(tabId, url) {
 
     if (matchedConfig) {
       // マッチするサイトが開かれている場合
-      const isCustomPanelOpen = currentOptions.path && !PANEL_CONFIGS.some(c => c.path === currentOptions.path);
+      // EDIT: パスを正規化して比較
+      const isCustomPanelOpen = currentOptions.path && !PANEL_CONFIGS.some(c => normalizePath(c.path) === normalizePath(currentOptions.path));
 
       if (isCustomPanelOpen) {
         await chrome.sidePanel.setOptions({ tabId, enabled: true });
@@ -50,7 +55,8 @@ async function updateSidePanel(tabId, url) {
     } else {
       // マッチするサイトがない場合
       // ユーザーが意図的に開いたカスタムパネル等でなければ無効化
-      const isConfiguredSitePanel = PANEL_CONFIGS.some(c => c.path === currentOptions.path);
+      // EDIT: パスを正規化して比較
+      const isConfiguredSitePanel = PANEL_CONFIGS.some(c => normalizePath(c.path) === normalizePath(currentOptions.path));
       if (!currentOptions.path || isConfiguredSitePanel) {
         await chrome.sidePanel.setOptions({ tabId, enabled: false });
       }
@@ -75,9 +81,17 @@ chrome.tabs.onActivated.addListener(async (activeInfo) => {
   }
 });
 
-// Scriptからのメッセージを受けてサイドパネルを開く
+// EDIT: Scriptからのメッセージを受けて対象パネルを設定して開く
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === 'openSidePanel' && sender.tab) {
-    chrome.sidePanel.open({ tabId: sender.tab.id });
+  if (message.action === 'openSidePanel' && sender.tab?.id) {
+    const tabId = sender.tab.id;
+    const matchedConfig = sender.tab.url ? PANEL_CONFIGS.find(config => config.match(sender.tab.url)) : null;
+    const targetPath = message.path || (matchedConfig ? matchedConfig.path : 'sidepanel/gigafile.html');
+    chrome.sidePanel.setOptions({
+      tabId,
+      path: targetPath,
+      enabled: true
+    });
+    chrome.sidePanel.open({ tabId });
   }
 });
