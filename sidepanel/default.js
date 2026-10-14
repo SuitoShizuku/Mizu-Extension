@@ -26,6 +26,13 @@
     // 全データ取得
     let AllData = await chrome.storage.local.get(null);
 
+    let gfFileManager = document.getElementById("gfFileManager");
+    gfFileManager.checked = AllData.gigafileFileManager ?? true;
+    gfFileManager.addEventListener('click', async (event) => {
+        const isChecked = (event.target).checked;
+        await chrome.storage.local.set({ gigafileFileManager: isChecked })
+    });
+
     let gfCopy = document.getElementById("gfCopy");
     gfCopy.checked = AllData.gigafileCopy ?? true;
     gfCopy.addEventListener('click', async (event) => {
