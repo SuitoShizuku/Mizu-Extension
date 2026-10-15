@@ -1,0 +1,146 @@
+/* EDIT: 背景動画コンテナ (body直下の最背面に配置) */
+#yt-backur-container {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  display: none;
+  background-color: #000;
+}
+
+/* EDIT: 有効化時のみ表示 (htmlまたはbodyにyt-backur-activeが付与された場合) */
+.yt-backur-active #yt-backur-container {
+  display: block !important;
+}
+
+/* EDIT: 背景描画用Canvas (端のブラー欠け防止のため若干拡大) */
+#yt-backur-canvas {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100vw;
+  height: 100vh;
+  transform: translate(-50%, -50%) scale(1.08);
+  object-fit: cover;
+  pointer-events: none;
+  will-change: filter, opacity;
+  transition: opacity 0.25s ease, filter 0.25s ease;
+}
+
+/* EDIT: YouTube各層の背景を透過させて最背景の動画を可視化 */
+html.yt-backur-active,
+html.yt-backur-active body,
+.yt-backur-active ytd-app,
+.yt-backur-active #page-manager,
+.yt-backur-active ytd-watch-flexy,
+.yt-backur-active ytd-watch-grid,
+.yt-backur-active #columns,
+.yt-backur-active #primary,
+.yt-backur-active #secondary,
+.yt-backur-active #primary-inner,
+.yt-backur-active #secondary-inner,
+.yt-backur-active #content,
+.yt-backur-active #player,
+.yt-backur-active #player-theater-container,
+.yt-backur-active #player-container-outer,
+.yt-backur-active #player-container-inner,
+.yt-backur-active #player-container {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* EDIT: YouTube公式アンビエントモード (cinematics) との競合を防止 */
+.yt-backur-active #cinematics {
+  display: none !important;
+}
+
+/* EDIT: ヘッダーバーの視認性と操作性を保ちつつ最背景を透過 */
+.yt-backur-active ytd-masthead,
+.yt-backur-active #masthead-container,
+.yt-backur-active #background.ytd-masthead,
+.yt-backur-active #container.ytd-masthead {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* EDIT: ヘッダー全体に軽いすりガラス効果を与えて背景動画と融合 */
+.yt-backur-active #masthead-container {
+  background: rgba(10, 10, 10, 0.25) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* EDIT: 検索窓本体の背景透過とグラスモフィズム表現 */
+.yt-backur-active #container.ytd-searchbox {
+  background: rgba(255, 255, 255, 0.07) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* EDIT: 検索窓フォーカス時のハイライト */
+.yt-backur-active ytd-searchbox[has-focus] #container.ytd-searchbox {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(62, 166, 255, 0.8) !important;
+}
+
+/* EDIT: 検索入力テキストの透過 */
+.yt-backur-active input#search {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+/* EDIT: 検索ボタン (虫眼鏡アイコン) の透過 */
+.yt-backur-active #search-icon-legacy {
+  background: rgba(255, 255, 255, 0.06) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-left: none !important;
+}
+
+.yt-backur-active #search-icon-legacy:hover {
+  background: rgba(255, 255, 255, 0.14) !important;
+}
+
+/* EDIT: 音声検索ボタンの透過 */
+.yt-backur-active #voice-search-button,
+.yt-backur-active #voice-search-button yt-icon-button {
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-radius: 50% !important;
+}
+
+.yt-backur-active #voice-search-button:hover,
+.yt-backur-active #voice-search-button yt-icon-button:hover {
+  background: rgba(255, 255, 255, 0.16) !important;
+}
+
+/* ADD: 検索サジェスト (入力候補) ドロップダウンのすりガラス表現 */
+.yt-backur-active .sbdd_b,
+.yt-backur-active .sbsb_a {
+  background: rgba(18, 18, 22, 0.82) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+}
+
+.yt-backur-active .sbpqs_a,
+.yt-backur-active .sbqs_c {
+  color: #f0f0f4 !important;
+}
+
+/* EDIT: フルスクリーン時やミニプレーヤー時は干渉を防ぐため非表示 */
+.yt-backur-fullscreen #yt-backur-container {
+  display: none !important;
+}
+
