@@ -25,6 +25,10 @@
     {
       "matches": [ "https://*.gigafile.nu/*", "https://gigafile.nu/" ],
       "js": [ "gigafile.js" ]
+    },
+    {
+      "matches": [ "https://www.youtube.com/*" ],
+      "js": [ "youtube.js" ]
     }
   ]
 }
