@@ -6,12 +6,12 @@
      */
     if (location.href == 'https://gigafile.nu/') {
         const settings = await chrome.storage.local.get({
+            gigafileFileManager: true,
             gigafileCopy: true,
             gigafileDelKey: false
         });
         const targetNode = document.getElementById("file_list")
         const callback = async (mutationsList, observer) => {
-            if (!settings.gigafileCopy) return;
             for (const mutation of mutationsList) {
                 if (mutation.type === 'childList') {
                     for (const ednode of mutation.addedNodes) {
@@ -24,6 +24,29 @@
                         // ここでaTagのstyleのdisplayがinlineになるまで待つ
                         await waitForDisplayInline(aTag);
 
+                        if (settings.gigafileFileManager) {
+                            // ファイルの日付を算出
+                            const fileDateArr = aTag.getAttribute('href').split(/\/|-/)[3].match(/.{1,2}/g)
+                            const nowDate = new Date();
+                            let fileDate = 0;
+                            // 今が7~12月 かつ ファイルの日付が1~6月なら ファイルの日付を翌年にする。
+                            if(nowDate.getMonth() >= 6 && nowDate.getMonth() <= 11 && Number(fileDateArr[0]) >= 0 && Number(fileDateArr[0]) <= 5) {
+                                fileDateArr.unshift((nowDate.getFullYear() + 1).toString())
+                                fileDate = new Date(fileDateArr[0], fileDateArr[1]-1, fileDateArr[2], 0, 0, 0).getTime();
+                            }else {
+                                fileDateArr.unshift(nowDate.getFullYear().toString())
+                                fileDate = new Date(fileDateArr[0], fileDateArr[1]-1, fileDateArr[2], 0, 0, 0).getTime();
+                            }
+                            const fileData = await chrome.storage.local.get({ gigafileFiles: [] })
+                            fileData.gigafileFiles.push({
+                                url: aTag.getAttribute('href'),
+                                filename: ednode.getElementsByTagName('span').item(0).textContent,
+                                date: fileDate,
+                                deleteKey: delKey.getAttribute('origin')
+                            })
+                            await chrome.storage.local.set(fileData)
+                        }
+
                         // 出力
                         // const url = aTag.getAttribute('href') + "?deleteKey=" + delKey.getAttribute('origin');
                         const url = function () {
@@ -34,7 +57,7 @@
                             }
                         }();
 
-                        if (!ednode.querySelector('.custom-copy-btn')) {
+                        if (!ednode.querySelector('.custom-copy-btn') && settings.gigafileCopy) {
                             addButton(ednode, url);
                         }
                     }
@@ -96,6 +119,8 @@
         let inputDelKey = document.getElementById("delkey");
         inputDelKey.value = delKey[1]
     }
+
+    //ファイルマネージャー
     let sidepanelButton = document.createElement('button')
     sidepanelButton.style.width = '468px';
     sidepanelButton.style.height = '35px';

@@ -1,28 +1,70 @@
+// 通知ヘッダー
+let notificationTimer = null;
+async function setNof(texts) {
+    // 残ったタイマー初期化
+    if (notificationTimer) {
+        clearTimeout(notificationTimer);
+    }
+
+    const notificationObj = document.getElementById("notification");
+    const header = document.getElementsByTagName("header").item(0);
+    notificationObj.textContent = texts;
+    header.style.display = 'block';
+    header.classList.add('nofShow');
+    header.classList.remove('nofHide');
+    setTimeout(() => {
+        header.classList.remove('nofShow');
+        header.classList.add('nofHide');
+        setTimeout(() => {
+            header.style.display = 'none';
+        }, 500);
+    }, 2500);
+}
+
+
 (async () => {
-    /**
-     * @type {{files: Array<{
-     *  url: string,
-     *  filename: string,
-     *  date: number,
-     *  deleteKey: string}>}}
-     */
-    const db = await chrome.storage.local.get({ files: []});
-    db.files.forEach((file) => {
-        // 日付チェック
-        const now = new Date();
-        if(now.getTime() > file.date) {
-            //期限切れならデータベースから消す
-            db.files = db.files.filter((f) => f.url !== file.url);
-            chrome.storage.local.set({ files: db.files });
-            return;
-        };
-        // 日付を正規化
-        const date = new Date(file.date);
-        const year = date.getFullYear();
-        const month = date.getMonth() + 1;
-        const day = date.getDate();
-        addFile(file.url, file.filename, `${year}年${month}月${day}日`, file.deleteKey);
-    })
+    init();
+
+    // ストレージが変更されたら初期化処理を実行
+    chrome.storage.onChanged.addListener((changes, area) => {
+        if (area === 'local' && changes.gigafileFiles) {
+            init();
+        }
+    });
+
+    async function init() {
+        /**
+         * @type {{gigafileFiles: Array<{
+         *  url: string,
+         *  filename: string,
+         *  date: number,
+         *  deleteKey: string}>}}
+         */
+        const db = await chrome.storage.local.get({ gigafileFiles: [] });
+        // 再初期化時に既存の要素をクリア
+        const filesElm = document.getElementById('files');
+        if (filesElm) filesElm.innerHTML = '';
+
+        db.gigafileFiles.forEach((file) => {
+            // 日付チェック
+            const now = new Date()
+            now.setHours(0, 0, 0, 0)
+            if (now.getTime() > file.date) {
+                //期限切れならデータベースから消す
+                db.gigafileFiles = db.gigafileFiles.filter((f) => f.url !== file.url);
+                chrome.storage.local.set({ gigafileFiles: db.gigafileFiles });
+                return;
+            };
+            // 日付を正規化
+            const date = new Date(file.date);
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            // 残り日数計算
+            const last = new Date(date - now).getTime() / 1000 / 60 / 60 / 24
+            addFile(file.url, file.filename, `${year}年${month}月${day}日(${last}日)`, file.deleteKey);
+        })
+    }
 })();
 
 
@@ -40,14 +82,16 @@ function addFile(url, filename, date, deleteKey) {
             <span>
                 <date>${date}</date>
                 <button class="btn-copy">Copy</button>
-                <button class="btn-dl">DL</button>
+                <!-- <button class="btn-dl">DL</button> -->
                 <input type="text" readonly style="width:4em" value="${deleteKey}">
-                <button class="btn-delete">Delete</button>
+                <!-- <button class="btn-delete">Delete</button> -->
+                <button class="btn-remove">Remove</button>
             </span>`;
 
     elm.querySelector('.btn-copy').addEventListener('click', () => copyUrl(url));
-    elm.querySelector('.btn-dl').addEventListener('click', () => openUrl(url));
-    elm.querySelector('.btn-delete').addEventListener('click', () => deleteFile(url, deleteKey));
+    // elm.querySelector('.btn-dl').addEventListener('click', () => openUrl(url));
+    // elm.querySelector('.btn-delete').addEventListener('click', () => deleteFile(url, deleteKey));
+    elm.querySelector('.btn-remove').addEventListener('click', () => removeFile(url));
 
     document.getElementById('files').append(elm);
 }
@@ -57,7 +101,10 @@ function addFile(url, filename, date, deleteKey) {
  * @param {string} url
  */
 function copyUrl(url) {
-    navigator.clipboard.writeText(url);
+    navigator.clipboard.writeText(url)
+        .catch(() => {
+            setNof("コピーに失敗しました。");
+        })
 }
 
 /**
@@ -92,12 +139,23 @@ async function deleteFile(url, delkey) {
             }
             const json = await response.json();
             if (json.status === 0) {
-                alert("このファイルを削除しました。");
+                setNof("このファイルを削除しました。");
             } else {
-                alert("このファイルの削除に失敗しました。");
+                setNof("このファイルの削除に失敗しました。");
             }
         } catch (error) {
-            alert("このファイルの削除に失敗しました。");
+            setNof("このファイルの削除に失敗しました。");
         }
     }
+}
+
+/**
+ * ファイル削除関数
+ * @param {string} url
+ */
+async function removeFile(url) {
+    const db = await chrome.storage.local.get({ gigafileFiles: [] });
+    db.gigafileFiles = db.gigafileFiles.filter((f) => f.url !== url);
+    await chrome.storage.local.set({ gigafileFiles: db.gigafileFiles });
+    setNof("リストから削除しました");
 }
