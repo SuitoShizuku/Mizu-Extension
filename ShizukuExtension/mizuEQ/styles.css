@@ -1,0 +1,834 @@
+/* ============================================================
+ * EDIT: mizu-q 統合スタイルシート (styles.css)
+ * EDIT: プロ仕様オーディオプラグインデザイン (Ozone / Pro-Q クラスの質感)
+ * ============================================================ */
+
+/* ============================================================
+ * 1. デザイントークン & 変数
+ * ============================================================ */
+:root {
+  --mq-bg-root: #121418;
+  --mq-bg-surface: #181b20;
+  --mq-bg-panel: #1e2229;
+  --mq-bg-elevated: #262b34;
+  --mq-bg-hover: #2f3540;
+
+  --mq-border-subtle: rgba(255, 255, 255, 0.06);
+  --mq-border-medium: rgba(255, 255, 255, 0.12);
+  --mq-border-focus: #38bdf8;
+
+  --mq-accent: #38bdf8;
+  --mq-accent-muted: #0284c7;
+  --mq-accent-active: #0ea5e9;
+
+  --mq-text-primary: #f1f5f9;
+  --mq-text-secondary: #94a3b8;
+  --mq-text-muted: #64748b;
+  --mq-text-dim: #475569;
+
+  --mq-success: #10b981;
+  --mq-warning: #f59e0b;
+  --mq-danger: #ef4444;
+
+  --mq-font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mq-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* ============================================================
+ * 2. Popup UI スタイル (拡張機能クリック時のメニュー)
+ * ============================================================ */
+.popup-body {
+  width: 330px;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--mq-font-sans);
+  background: var(--mq-bg-root);
+  color: var(--mq-text-primary);
+  font-size: 12px;
+  overflow: hidden;
+  user-select: none;
+}
+
+.popup-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  background: var(--mq-bg-root);
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+.popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--mq-border-subtle);
+}
+
+.popup-logo {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.popup-logo-text {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--mq-text-primary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.popup-logo-sub {
+  font-size: 10px;
+  color: var(--mq-text-muted);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.status-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--mq-bg-surface);
+  border: 1px solid var(--mq-border-subtle);
+  border-radius: 4px;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--mq-text-dim);
+  transition: all 0.2s ease;
+}
+
+.status-dot.active {
+  background: var(--mq-success);
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+}
+
+.status-dot.matched {
+  background: var(--mq-warning);
+}
+
+.status-text {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--mq-text-secondary);
+}
+
+.eq-toggle {
+  padding: 5px 14px;
+  border: 1px solid var(--mq-border-medium);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--mq-bg-panel);
+  color: var(--mq-text-primary);
+  letter-spacing: 0.04em;
+  transition: all 0.15s ease;
+}
+
+.eq-toggle:hover:not(:disabled) {
+  background: #a0a0a0;
+  border-color: var(--mq-text-muted);
+}
+
+.eq-toggle:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.eq-toggle:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.eq-toggle.active {
+  background: #2b1717;
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+
+.eq-toggle.active:hover:not(:disabled) {
+  background: #381c1c;
+  border-color: rgba(239, 68, 68, 0.6);
+}
+
+.match-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  background: var(--mq-bg-surface);
+  border: 1px solid var(--mq-border-subtle);
+  border-radius: 4px;
+  font-size: 11px;
+  color: var(--mq-text-secondary);
+}
+
+.match-info.no-match {
+  color: var(--mq-text-muted);
+}
+
+.match-icon {
+  font-size: 11px;
+}
+
+.patterns-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.section-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--mq-text-muted);
+}
+
+.patterns-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.patterns-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.patterns-list::-webkit-scrollbar-thumb {
+  background: var(--mq-bg-elevated);
+  border-radius: 2px;
+}
+
+.pattern-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pattern-input {
+  flex: 1;
+  padding: 6px 10px;
+  background: var(--mq-bg-surface);
+  border: 1px solid var(--mq-border-subtle);
+  border-radius: 4px;
+  color: var(--mq-text-primary);
+  font-family: var(--mq-font-mono);
+  font-size: 11px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.pattern-input:focus {
+  border-color: var(--mq-border-focus);
+  background: var(--mq-bg-panel);
+}
+
+.pattern-input::placeholder {
+  color: var(--mq-text-dim);
+}
+
+.btn-remove {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--mq-text-muted);
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.15s ease;
+}
+
+.btn-remove:hover {
+  background: var(--mq-bg-hover);
+  color: var(--mq-danger);
+  border-color: var(--mq-border-subtle);
+}
+
+.btn-add {
+  padding: 6px 10px;
+  background: var(--mq-bg-surface);
+  border: 1px dashed var(--mq-border-medium);
+  border-radius: 4px;
+  color: var(--mq-text-secondary);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-add:hover {
+  background: var(--mq-bg-panel);
+  border-color: var(--mq-text-muted);
+  color: var(--mq-text-primary);
+}
+
+.popup-footer {
+  padding-top: 8px;
+  border-top: 1px solid var(--mq-border-subtle);
+}
+
+.help-text {
+  font-size: 10px;
+  color: var(--mq-text-dim);
+  line-height: 1.4;
+}
+
+/* ============================================================
+ * 3. Content Script - Floating EQ Window (スタジオEQ UI)
+ * ============================================================ */
+.eq-window {
+  position: fixed;
+  z-index: 2147483647;
+  display: flex;
+  flex-direction: column;
+  width: 895px;
+  height: 440px;
+  background: var(--mq-bg-root);
+  border: 1px solid var(--mq-border-medium);
+  border-radius: 6px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  box-sizing: border-box;
+  font-family: var(--mq-font-sans);
+  color: var(--mq-text-primary);
+  user-select: none;
+  overflow: hidden;
+}
+
+.eq-window.mini {
+  width: 340px;
+  height: 150px;
+}
+
+.eq-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.eq-window.mini .volume-faders {
+  display: none;
+}
+
+.eq-window.mini .eq-help-hint {
+  display: none;
+}
+
+/* ヘッダーバー */
+.eq-header {
+  height: 34px;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  background: var(--mq-bg-surface);
+  border-bottom: 1px solid var(--mq-border-subtle);
+  cursor: grab;
+}
+
+.eq-header:active {
+  cursor: grabbing;
+}
+
+.eq-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.eq-logo {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--mq-accent);
+  text-transform: uppercase;
+}
+
+.eq-help-hint {
+  font-size: 10px;
+  color: var(--mq-text-dim);
+  letter-spacing: 0.01em;
+}
+
+.eq-header-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.eq-btn {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  color: var(--mq-text-muted);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.eq-btn:hover {
+  background: var(--mq-bg-elevated);
+  border-color: var(--mq-border-subtle);
+  color: var(--mq-text-primary);
+}
+
+.eq-btn.close-btn:hover {
+  background: #381c1c;
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+
+.eq-btn.power-btn {
+  color: var(--mq-text-dim);
+}
+
+.eq-btn.power-btn.active {
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.28);
+  background: rgba(16, 185, 129, 0.10);
+}
+
+.eq-btn.power-btn:hover {
+  color: #6ee7b7;
+}
+
+/* プリセットドロップダウン */
+.preset-dropdown-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.preset-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 150px;
+  gap: 6px;
+  padding: 3px 8px;
+  background: var(--mq-bg-panel);
+  border: 1px solid var(--mq-border-subtle);
+  border-radius: 3px;
+  color: var(--mq-text-secondary);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.preset-btn:hover {
+  background: var(--mq-bg-elevated);
+  border-color: var(--mq-border-medium);
+  color: var(--mq-text-primary);
+}
+
+.preset-arrow {
+  font-size: 8px;
+  opacity: 0.6;
+}
+
+.preset-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  width: 170px;
+  background: var(--mq-bg-panel);
+  border: 1px solid var(--mq-border-medium);
+  border-radius: 4px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+  z-index: 100;
+  padding: 4px 0;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.preset-section-title {
+  padding: 4px 10px 2px;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--mq-text-dim);
+}
+
+.preset-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 10px;
+  font-size: 11px;
+  color: var(--mq-text-secondary);
+  cursor: pointer;
+  transition: background 0.1s ease;
+}
+
+.preset-item:hover {
+  background: var(--mq-bg-hover);
+  color: var(--mq-text-primary);
+}
+
+.preset-item.active {
+  background: var(--mq-bg-elevated);
+  color: var(--mq-accent);
+  font-weight: 600;
+}
+
+.preset-del-btn {
+  font-size: 10px;
+  color: var(--mq-text-dim);
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+.preset-del-btn:hover {
+  color: var(--mq-danger);
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.preset-menu-divider {
+  height: 1px;
+  background: var(--mq-border-subtle);
+  margin: 4px 0;
+}
+
+.save-preset-action {
+  padding: 5px 10px;
+  font-size: 11px;
+  color: var(--mq-accent);
+  cursor: pointer;
+}
+
+.save-preset-action:hover {
+  background: var(--mq-bg-hover);
+}
+
+/* スペクトラムコンテナ */
+.spectrum-container {
+  flex: 1;
+  position: relative;
+  background: #0f1115;
+  overflow: hidden;
+}
+
+.volume-faders {
+  width: 133px;
+  flex: 0 0 133px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 10px 6px 8px;
+  box-sizing: border-box;
+  background: #14171d;
+  border-left: 1px solid var(--mq-border-subtle);
+}
+
+.fader-row {
+  display: flex;
+  justify-content: space-evenly;
+  gap: 2px;
+  min-height: 0;
+}
+
+.volume-fader {
+  width: 39px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.volume-label {
+  font: 700 8px var(--mq-font-mono);
+  letter-spacing: 0.03em;
+  color: var(--mq-text-secondary);
+}
+
+.volume-value {
+  width: 42px;
+  font: 9px var(--mq-font-mono);
+  color: var(--mq-accent);
+  text-align: center;
+}
+
+.volume-slider {
+  width: 18px;
+  height: 300px;
+  margin: 4px 0 0;
+  writing-mode: vertical-lr;
+  direction: rtl;
+  accent-color: var(--mq-accent);
+  cursor: ns-resize;
+}
+
+.limiter-slider {
+  accent-color: #34d399;
+}
+
+.fader-actions {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 5px;
+  padding: 0 2px;
+}
+
+.fader-action-btn {
+  height: 24px;
+  padding: 0 6px;
+  border: 1px solid var(--mq-border-medium);
+  border-radius: 3px;
+  background: var(--mq-bg-panel);
+  color: var(--mq-text-dim);
+  font: 700 9px var(--mq-font-mono);
+  cursor: pointer;
+}
+
+.fader-action-btn:hover {
+  color: var(--mq-text-primary);
+  background: var(--mq-bg-elevated);
+}
+
+.fader-action-btn.active {
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.35);
+  background: rgba(16, 185, 129, 0.10);
+}
+
+.current-level {
+  display: block;
+  margin-top: 0;
+  padding: 4px 2px 2px;
+  color: var(--mq-text-secondary);
+  font: 700 11px var(--mq-font-mono);
+  text-align: center;
+}
+
+.signal-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  margin-top: 0;
+  padding-top: 7px;
+  border-top: 1px solid var(--mq-border-subtle);
+  color: var(--mq-text-dim);
+  font: 700 10px var(--mq-font-mono);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.signal-flow b {
+  color: var(--mq-accent-muted);
+  font-weight: 400;
+}
+
+.current-level.level-green {
+  color: #34d399;
+}
+
+.current-level.level-yellow {
+  color: #fbbf24;
+}
+
+.current-level.level-red,
+.current-level.clipping {
+  color: #fb7185;
+  text-shadow: 0 0 7px rgba(251, 113, 133, 0.4);
+}
+
+.spectrum-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ============================================================
+ * EDIT: ノードHUDポップアップ (精密なパラメータインジケーター & 数値直接入力)
+ * ============================================================ */
+.node-hud-popup {
+  position: absolute;
+  transform: translate(-50%, 0);
+  background: #14171d;
+  border: 1px solid var(--mq-border-medium);
+  border-radius: 4px;
+  padding: 6px 9px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.7);
+  pointer-events: auto;
+  z-index: 10;
+  min-width: 135px;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+.hud-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 5px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.hud-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+.hud-title {
+  flex: 1;
+}
+
+.hud-num {
+  font-size: 9px;
+  opacity: 0.7;
+  font-family: var(--mq-font-mono);
+}
+
+.hud-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.hud-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  gap: 6px;
+}
+
+.hud-label {
+  color: var(--mq-text-muted);
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.hud-val {
+  color: var(--mq-text-primary);
+  font-family: var(--mq-font-mono);
+  font-weight: 500;
+}
+
+/* ADD: 数値入力ラップ & 入力フィールド */
+.hud-input-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+}
+
+.hud-input {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  color: var(--mq-text-primary);
+  font-family: var(--mq-font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  text-align: right;
+  padding: 1px 4px;
+  width: 50px;
+  height: 18px;
+  box-sizing: border-box;
+  outline: none;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease, color 0.12s ease;
+}
+
+.hud-input:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  cursor: text;
+}
+
+.hud-input:focus {
+  background: #191d26;
+  border-color: var(--mq-border-focus, #38bdf8);
+  color: #ffffff;
+  cursor: text;
+  box-shadow: 0 0 0 1.5px rgba(56, 189, 248, 0.3);
+}
+
+.hud-unit {
+  font-size: 9px;
+  color: var(--mq-text-muted);
+  font-family: var(--mq-font-mono);
+  min-width: 14px;
+  text-align: left;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Popup は設定に集中できる、装飾を抑えたコンパクトな外観にする。 */
+.popup-body {
+  margin: 0;
+  min-width: 300px;
+  background: #fff;
+  color: var(--mq-text-primary);
+  font-family: var(--mq-font-sans);
+}
+
+.popup-container {
+  padding: 14px;
+  background: var(--mq-bg-root);
+  border: 0;
+  box-shadow: none;
+}
+
+.popup-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 0 10px; border-bottom: 1px solid #e5e7eb; }
+.popup-logo { gap: 6px; }
+.popup-logo-text { color: var(--mq-accent); font-size: 15px; }
+.popup-credit { color: var(--mq-text-dim); font-size: 9px; text-decoration: none; white-space: nowrap; }
+.popup-credit:hover { color: var(--mq-text-secondary); text-decoration: underline; }
+.popup-logo-sub, .popup-footer { display: none; }
+.status-section { padding: 12px 0; gap: 10px; }
+.status-indicator { color: #4b5563; }
+.status-text { font-size: 12px; }
+.status-dot { width: 8px; height: 8px; background: #9ca3af; }
+.status-dot.active, .status-dot.matched { background: #16a34a; box-shadow: none; }
+.eq-toggle { border-radius: 4px; background: #808080; color: #111827; box-shadow: none; }
+.eq-toggle.active { background: #111827; color: #fff; }
+.match-info { padding: 8px 0; background: transparent; border: 0; border-top: 1px solid #e5e7eb; border-radius: 0; color: var(--mq-text-secondary); }
+.patterns-section { padding-top: 12px; }
+.section-title { color: var(--mq-text-secondary); font-size: 12px; }
+.pattern-help { display: none; }
+.patterns-list { max-height: 144px; }
+.render-settings-section { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 10px; border-top: 1px solid #e5e7eb; }
+.render-settings-label { color: var(--mq-text-secondary); font-size: 12px; }
+.render-settings-select { min-width: 88px; padding: 5px 8px; border: 1px solid #e5e7eb; border-radius: 4px; background: var(--mq-bg-panel); color: var(--mq-text-secondary); font: inherit; }
+.pattern-input { background: var(--mq-bg-panel); border-color: var(--mq-bg-root); color: var(--mq-text-secondary); border-radius: 4px; }
+.patterb-input::placeholder { color:var(--mq-text-dim)}
+.pattern-input:focus { border-color: var(--mq-border-focus); color: var(--mq-text-secondary); box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15); }
+.btn-add { background: #f3f4f6; color: var(--mq-text-secondary); border-radius: 4px; }
+.btn-remove { color: #6b7280; }
