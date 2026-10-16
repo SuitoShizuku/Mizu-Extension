@@ -21,34 +21,59 @@
     <hr>
     <h2><a href="https://youtube.com/" target="_blank">YouTube</a></h2>
     <div>
-      <label class="toggle">
-        <input type="checkbox" id="ytBackur">
-        <span class="slider"></span>
+      <label>
+        <label class="toggle">
+          <input type="checkbox" id="ytBackur">
+          <span class="slider"></span>
+        </label>
+        背景に動画を挿入</label>
+    </div>
+    <div>
+      <label class="value">
+        <input type="number" id="ytBackurConfigsBlur" min="0" max="128" step="1" value="20" class="value-input">
+        ぼかし量(px)
+        <input type="range" id="ytBackurConfigsBlurRange" min="0" max="128" step="1" value="20" class="value-slider">
       </label>
-      背景に動画を挿入
+    </div>
+    <div>
+      <label class="value">
+        <input type="number" id="ytBackurConfigsBrightness" min="0" max="100" step="1" value="70" class="value-input">
+        明度(%)
+        <input type="range" id="ytBackurConfigsBrightnessRange" min="0" max="100" step="1" value="70" class="value-slider">
+      </label>
+    </div>
+    <div>
+      <label class="value">
+        <input type="number" id="ytBackurConfigsOpacity" min="0" max="100" step="1" value="85" class="value-input">
+        不透明度(%)
+        <input type="range" id="ytBackurConfigsOpacityRange" min="0" max="100" step="1" value="85" class="value-slider">
+      </label>
     </div>
     <hr>
     <h2><a href="https://gigafile.nu/" target="_blank">GigaFile便</a></h2>
     <div>
-      <label class="toggle">
-        <input type="checkbox" id="gfFileManager" checked>
-        <span class="slider"></span>
-      </label>
-      アップロードしたファイルをマネージャーに記録。
+      <label>
+        <label class="toggle">
+          <input type="checkbox" id="gfFileManager" checked>
+          <span class="slider"></span>
+        </label>
+        アップロードしたファイルをマネージャーに記録。</label>
     </div>
     <div>
-      <label class="toggle">
-        <input type="checkbox" id="gfCopy" checked>
-        <span class="slider"></span>
-      </label>
-      アップロード時にリンクのコピーボタンを付ける。
+      <label>
+        <label class="toggle">
+          <input type="checkbox" id="gfCopy" checked>
+          <span class="slider"></span>
+        </label>
+        アップロード時にリンクのコピーボタンを付ける。</label>
     </div>
     <div>
-      <label class="toggle">
-        <input type="checkbox" id="gfDelKey">
-        <span class="slider"></span>
-      </label>
-      コピーボタンからのコピー時、削除キーも付属させる。
+      <label>
+        <label class="toggle">
+          <input type="checkbox" id="gfDelKey">
+          <span class="slider"></span>
+        </label>
+        コピーボタンからのコピー時、削除キーも付属させる。</label>
     </div>
     <hr>
     <button id="initializeCache">拡張機能のキャッシュ・データを削除</button>

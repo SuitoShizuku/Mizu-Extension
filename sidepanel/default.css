@@ -66,6 +66,32 @@ button {
     width: 0;
     height: 0;
 }
+.value {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+.value-input {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+    padding: 0;
+    padding-block: 0;
+    padding-inline: 0;
+    margin-right: 4px;
+}
+.value-slider {
+    position: relative;
+    display: inline;
+    width: calc(100% - 125px);
+    height: 24px;
+    margin-left: auto;
+    padding: 0;
+    padding-block: 0;
+    padding-inline: 0;
+}
 
 /* EDIT: スライダーのスタイル（OFF状態：グレー） */
 .slider {

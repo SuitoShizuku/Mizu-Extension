@@ -1,6 +1,6 @@
 (() => {
     // デフォルト値
-    const DEFAULTS = { blur: 40, brightness: 70, opacity: 85 };
+    const DEFAULTS = { blur: 20, brightness: 70, opacity: 85 };
     const CANVAS_W = 320, CANVAS_H = 180;
     const FPS_INTERVAL = 1000 / 30;
 
@@ -11,10 +11,17 @@
     function loadConfig(cb) {
         // ストレージ
         chrome.storage.local.get({
-            youtubeBackurConfigs: DEFAULTS,
+            youtubeBackurConfigsBlur: 20,
+            youtubeBackurConfigsBrightness: 70,
+            youtubeBackurConfigsOpacity: 85,
             youtubeBackur: false
         }, (items) => {
-            cfg = { enabled: items.youtubeBackur, ...DEFAULTS, ...items.youtubeBackurConfigs };
+            const conf = {
+                blur: items.youtubeBackurConfigsBlur,
+                brightness: items.youtubeBackurConfigsBrightness,
+                opacity: items.youtubeBackurConfigsOpacity
+            }
+            cfg = { enabled: items.youtubeBackur, ...DEFAULTS, ...conf };
             cb && cb();
         });
     }
@@ -140,7 +147,7 @@
     // EDIT: ストレージ変更時にloadConfigで設定を再読み込み
     chrome.storage.onChanged.addListener((changes, area) => {
         if (area !== 'local') return;
-        if (!('youtubeBackur' in changes || 'youtubeBackurConfigs' in changes)) return;
+        if (!('youtubeBackur' in changes || 'youtubeBackurConfigsBlur' in changes || 'youtubeBackurConfigsBrightness' in changes || 'youtubeBackurConfigsOpacity' in changes)) return;
         loadConfig(() => { applyStyles(); checkPage(); });
     });
 
