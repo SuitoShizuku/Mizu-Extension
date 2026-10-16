@@ -47,9 +47,44 @@ html.yt-backur-active body,
 .yt-backur-active #player-theater-container,
 .yt-backur-active #player-container-outer,
 .yt-backur-active #player-container-inner,
-.yt-backur-active #player-container {
+.yt-backur-active #player-container,
+/* EDIT: プレイヤー上下の黒背景 */
+.yt-backur-active ytd-player,
+.yt-backur-active #movie_player,
+.yt-backur-active .html5-video-container,
+.yt-backur-active ytd-watch-flexy[theater] #player-theater-container,
+.yt-backur-active #above-the-fold,
+.yt-backur-active #below,
+.yt-backur-active #meta,
+.yt-backur-active ytd-watch-metadata,
+.yt-backur-active #title,
+.yt-backur-active ytd-video-primary-info-renderer,
+.yt-backur-active ytd-video-secondary-info-renderer,
+/* EDIT: 再生リスト背景 */
+.yt-backur-active ytd-playlist-panel-renderer,
+.yt-backur-active #playlist,
+.yt-backur-active ytd-watch-flexy #playlist,
+.yt-backur-active ytd-playlist-panel-renderer #container,
+.yt-backur-active #items.ytd-playlist-panel-renderer,
+/* EDIT: 関連動画・サイドバー */
+.yt-backur-active ytd-compact-video-renderer,
+.yt-backur-active ytd-item-section-renderer,
+.yt-backur-active ytd-section-list-renderer {
   background: transparent !important;
   background-color: transparent !important;
+}
+
+/* EDIT: プレイヤー上下のグラデーション黒帯を除去 */
+.yt-backur-active .ytp-gradient-top,
+.yt-backur-active .ytp-gradient-bottom {
+  display: none !important;
+}
+
+/* EDIT: 再生リストヘッダー */
+.yt-backur-active ytd-playlist-panel-renderer #header-description,
+.yt-backur-active ytd-playlist-panel-renderer #publisher-name,
+.yt-backur-active ytd-playlist-panel-renderer #playlist-action-menu {
+  background: transparent !important;
 }
 
 /* EDIT: YouTube公式アンビエントモード (cinematics) との競合を防止 */
