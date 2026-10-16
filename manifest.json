@@ -29,6 +29,11 @@
     {
       "matches": [ "https://www.youtube.com/*" ],
       "js": [ "youtube.js" ]
+    },
+    {
+      "matches": [ "https://www.youtube.com/watch*" ],
+      "js": [ "ShizukuExtension/youtubeBackur/content.js" ],
+      "css": [ "ShizukuExtension/youtubeBackur/content.css" ]
     }
   ]
 }

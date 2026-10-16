@@ -22,30 +22,11 @@ async function setNof(texts) {
 }
 
 (async () => {
-
-    // 全データ取得
-    let AllData = await chrome.storage.local.get(null);
-
-    let gfFileManager = document.getElementById("gfFileManager");
-    gfFileManager.checked = AllData.gigafileFileManager ?? true;
-    gfFileManager.addEventListener('click', async (event) => {
-        const isChecked = (event.target).checked;
-        await chrome.storage.local.set({ gigafileFileManager: isChecked })
-    });
-
-    let gfCopy = document.getElementById("gfCopy");
-    gfCopy.checked = AllData.gigafileCopy ?? true;
-    gfCopy.addEventListener('click', async (event) => {
-        const isChecked = (event.target).checked;
-        await chrome.storage.local.set({ gigafileCopy: isChecked })
-    });
-
-    let gfDelKey = document.getElementById("gfDelKey");
-    gfDelKey.checked = AllData.gigafileDelKey ?? false;
-    gfDelKey.addEventListener('click', async (event) => {
-        const isChecked = (event.target).checked;
-        await chrome.storage.local.set({ gigafileDelKey: isChecked })
-    });
+    // 設定の値を読み込み反映
+    setInitData('ytBackur', 'youtubeBackur', 'checkbox', false)
+    setInitData('gfFileManager', 'gigafileFileManager', 'checkbox', true)
+    setInitData('gfCopy', 'gigafileCopy', 'checkbox', true)
+    setInitData('gfDelKey', 'gigafileDelKey', 'checkbox', false)
 
     // 初期化ボタン
     document.getElementById("initializeCache").addEventListener('click', async (event) => {
@@ -67,3 +48,28 @@ async function setNof(texts) {
 
 
 })();
+
+/**
+ * 設定入力の初期化
+ * @param {string} elmId 対象の入力欄のID
+ * @param {string} key ストレージのキー
+ * @param {'checkbox' | 'value'} type ストレージの型
+ * @param {any} defaultValue デフォルトの値
+ */
+async function setInitData(elmId, key, type, defaultValue) {
+    let AllData = await chrome.storage.local.get(null);
+    let elm = document.getElementById(elmId);
+    if (type == 'checkbox') {
+        elm.checked = AllData[key] ?? defaultValue;
+        elm.addEventListener('click', async (event) => {
+            const isChecked = (event.target).checked;
+            await chrome.storage.local.set({ [key]: isChecked })
+        });
+    } else if (type == 'value') {
+        elm.value = AllData[key] ?? defaultValue;
+        elm.addEventListener('change', async (event) => {
+            const value = (event.target).value;
+            await chrome.storage.local.set({ [key]: value })
+        });
+    }
+}

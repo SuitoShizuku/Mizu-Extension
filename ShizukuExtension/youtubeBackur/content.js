@@ -1,328 +1,170 @@
-// EDIT: YouTubeBackur - content.js
 (() => {
-  // EDIT: デフォルト設定値
-  const DEFAULT_CONFIG = {
-    enabled: true,
-    blur: 40,        // 0～128px
-    brightness: 70,  // 0～100%
-    opacity: 85      // 0～100%
-  };
+    // デフォルト値
+    const DEFAULTS = { blur: 40, brightness: 70, opacity: 85 };
+    const CANVAS_W = 320, CANVAS_H = 180;
+    const FPS_INTERVAL = 1000 / 30;
 
-  let currentConfig = { ...DEFAULT_CONFIG };
+    let cfg = { enabled: true, ...DEFAULTS };
+    let containerEl, canvasEl, ctx, videoEl;
+    let loopId = null, useVFC = false, lastT = 0, watching = false;
 
-  // EDIT: 軽量化のためのCanvas解像度 (低解像度でキャプチャしCSSで拡大・ブラーをかけることでGPU/メモリ負荷を最小化)
-  const CANVAS_WIDTH = 320;
-  const CANVAS_HEIGHT = 180;
-  const TARGET_FPS = 30;
-  const FRAME_INTERVAL_MS = 1000 / TARGET_FPS;
-
-  let containerEl = null;
-  let canvasEl = null;
-  let ctx = null;
-  let videoEl = null;
-  let renderLoopId = null;
-  let useVideoFrameCallback = false;
-  let lastFrameTime = 0;
-  let isWatching = false;
-
-  // EDIT: 設定の読み込みとストレージ変更監視
-  function initConfig() {
-    chrome.storage.sync.get(DEFAULT_CONFIG, (items) => {
-      if (chrome.runtime.lastError) {
-        chrome.storage.local.get(DEFAULT_CONFIG, (localItems) => {
-          currentConfig = { ...DEFAULT_CONFIG, ...localItems };
-          applyConfigStyles();
+    function loadConfig(cb) {
+        // ストレージ
+        chrome.storage.local.get({
+            youtubeBackurConfigs: DEFAULTS,
+            youtubeBackur: false
+        }, (items) => {
+            cfg = { enabled: items.youtubeBackur, ...DEFAULTS, ...items.youtubeBackurConfigs };
+            cb && cb();
         });
-      } else {
-        currentConfig = { ...DEFAULT_CONFIG, ...items };
-        applyConfigStyles();
-      }
-    });
+    }
 
-    chrome.storage.onChanged.addListener((changes, areaName) => {
-      if (areaName === 'sync' || areaName === 'local') {
-        for (const [key, change] of Object.entries(changes)) {
-          if (key in currentConfig) {
-            currentConfig[key] = change.newValue;
-          }
+    function createDOM() {
+        if (!document.body || document.getElementById('yt-backur-container')) {
+            containerEl = document.getElementById('yt-backur-container');
+            canvasEl = document.getElementById('yt-backur-canvas');
+            if (canvasEl && !ctx) ctx = canvasEl.getContext('2d');
+            return;
         }
-        applyConfigStyles();
-        checkPageStatus();
-      }
-    });
-  }
-
-  // EDIT: CanvasとコンテナのDOM構築 (body直下に確実に配置)
-  function createDOMElements() {
-    if (!document.body) return;
-
-    if (document.getElementById('yt-backur-container')) {
-      containerEl = document.getElementById('yt-backur-container');
-      canvasEl = document.getElementById('yt-backur-canvas');
-      if (canvasEl && !ctx) {
+        containerEl = document.createElement('div');
+        containerEl.id = 'yt-backur-container';
+        canvasEl = document.createElement('canvas');
+        canvasEl.id = 'yt-backur-canvas';
+        canvasEl.width = CANVAS_W;
+        canvasEl.height = CANVAS_H;
         ctx = canvasEl.getContext('2d');
-      }
-      return;
+        containerEl.appendChild(canvasEl);
+        document.body.prepend(containerEl);
     }
 
-    containerEl = document.createElement('div');
-    containerEl.id = 'yt-backur-container';
-
-    canvasEl = document.createElement('canvas');
-    canvasEl.id = 'yt-backur-canvas';
-    canvasEl.width = CANVAS_WIDTH;
-    canvasEl.height = CANVAS_HEIGHT;
-
-    // EDIT: 互換性と描画安定性を最優先した2Dコンテキスト取得
-    ctx = canvasEl.getContext('2d');
-
-    containerEl.appendChild(canvasEl);
-    document.body.prepend(containerEl);
-  }
-
-  // EDIT: CSSフィルタと不透明度の動的適用
-  function applyConfigStyles() {
-    if (!canvasEl) return;
-    const { blur, brightness, opacity } = currentConfig;
-    canvasEl.style.filter = `blur(${blur}px) brightness(${brightness}%)`;
-    canvasEl.style.opacity = `${opacity / 100}`;
-  }
-
-  // EDIT: 現在のページが通常プレイヤー再生中かどうかの判定
-  function isNormalPlayerActive() {
-    // watchページ以外・ショート動画・埋め込み等は対象外
-    if (!location.pathname.startsWith('/watch')) {
-      return false;
+    function applyStyles() {
+        if (!canvasEl) return;
+        canvasEl.style.filter = `blur(${cfg.blur}px) brightness(${cfg.brightness}%)`;
+        canvasEl.style.opacity = cfg.opacity / 100;
     }
 
-    // フルスクリーン判定
-    const isFullscreen = !!(document.fullscreenElement || document.querySelector('.ytp-fullscreen'));
-    if (isFullscreen) {
-      document.documentElement.classList.add('yt-backur-fullscreen');
-      document.body.classList.add('yt-backur-fullscreen');
-      return false;
-    } else {
-      document.documentElement.classList.remove('yt-backur-fullscreen');
-      document.body.classList.remove('yt-backur-fullscreen');
+    function isNormalPlayer() {
+        if (!location.pathname.startsWith('/watch')) return false;
+        const fs = !!(document.fullscreenElement || document.querySelector('.ytp-fullscreen'));
+        document.documentElement.classList.toggle('yt-backur-fullscreen', fs);
+        document.body.classList.toggle('yt-backur-fullscreen', fs);
+        return !fs;
     }
 
-    return true;
-  }
-
-  // EDIT: 1フレームの描画処理 (超低解像度Canvasへ描画)
-  function renderFrame(now) {
-    if (!videoEl || videoEl.paused || videoEl.ended || document.hidden) {
-      return;
-    }
-
-    // EDIT: 最大FPS制限によるGPU負荷低減
-    if (!now || now - lastFrameTime >= FRAME_INTERVAL_MS) {
-      if (videoEl.videoWidth > 0 && videoEl.videoHeight > 0) {
-        if (!ctx && canvasEl) {
-          ctx = canvasEl.getContext('2d');
+    function renderFrame(now) {
+        if (!videoEl || videoEl.paused || videoEl.ended || document.hidden) return;
+        if (!now || now - lastT >= FPS_INTERVAL) {
+            if (videoEl.videoWidth > 0 && videoEl.videoHeight > 0) {
+                if (!ctx && canvasEl) ctx = canvasEl.getContext('2d');
+                if (ctx) {
+                    ctx.drawImage(videoEl, 0, 0, CANVAS_W, CANVAS_H);
+                    lastT = now || performance.now();
+                }
+            }
         }
-        if (ctx) {
-          ctx.drawImage(videoEl, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-          lastFrameTime = now || performance.now();
-        }
-      }
-    }
-  }
-
-  // EDIT: レンダリングループの開始
-  function startRenderLoop() {
-    stopRenderLoop();
-    if (!currentConfig.enabled || !isNormalPlayerActive() || !videoEl) {
-      return;
     }
 
-    isWatching = true;
-
-    // 初回1フレーム描画
-    renderFrame(performance.now());
-
-    if ('requestVideoFrameCallback' in HTMLVideoElement.prototype && typeof videoEl.requestVideoFrameCallback === 'function') {
-      useVideoFrameCallback = true;
-      const callback = (now, metadata) => {
-        if (!isWatching) return;
-        renderFrame(now);
-        renderLoopId = videoEl.requestVideoFrameCallback(callback);
-      };
-      renderLoopId = videoEl.requestVideoFrameCallback(callback);
-    } else {
-      useVideoFrameCallback = false;
-      const loop = (now) => {
-        if (!isWatching) return;
-        renderFrame(now);
-        renderLoopId = requestAnimationFrame(loop);
-      };
-      renderLoopId = requestAnimationFrame(loop);
-    }
-  }
-
-  // EDIT: レンダリングループの停止 (一時停止や非表示時のCPU/GPU消費ゼロ化)
-  function stopRenderLoop() {
-    isWatching = false;
-    if (renderLoopId !== null) {
-      if (useVideoFrameCallback && videoEl && typeof videoEl.cancelVideoFrameCallback === 'function') {
-        videoEl.cancelVideoFrameCallback(renderLoopId);
-      } else {
-        cancelAnimationFrame(renderLoopId);
-      }
-      renderLoopId = null;
-    }
-  }
-
-  // EDIT: 最適な動画要素を確実に検索
-  function findMainVideo() {
-    return document.querySelector('video.video-stream.html5-main-video') ||
-           document.querySelector('video.html5-main-video') ||
-           document.querySelector('#movie_player video') ||
-           document.querySelector('ytd-watch-flexy video') ||
-           document.querySelector('ytd-watch-grid video') ||
-           document.querySelector('video');
-  }
-
-  // EDIT: 動画要素の取得とイベントリスナーの登録
-  function bindVideoElement() {
-    const newVideo = findMainVideo();
-    if (!newVideo) return;
-
-    if (newVideo === videoEl) {
-      if (!videoEl.paused && !videoEl.ended && !isWatching) {
-        startRenderLoop();
-      }
-      return;
-    }
-
-    if (videoEl) {
-      videoEl.removeEventListener('play', onVideoPlay);
-      videoEl.removeEventListener('playing', onVideoPlay);
-      videoEl.removeEventListener('pause', onVideoPause);
-      videoEl.removeEventListener('ended', onVideoPause);
-      videoEl.removeEventListener('seeked', onVideoSeeked);
-      videoEl.removeEventListener('timeupdate', onVideoTimeUpdate);
-    }
-
-    videoEl = newVideo;
-
-    videoEl.addEventListener('play', onVideoPlay);
-    videoEl.addEventListener('playing', onVideoPlay);
-    videoEl.addEventListener('pause', onVideoPause);
-    videoEl.addEventListener('ended', onVideoPause);
-    videoEl.addEventListener('seeked', onVideoSeeked);
-    videoEl.addEventListener('timeupdate', onVideoTimeUpdate);
-
-    if (!videoEl.paused && !videoEl.ended) {
-      startRenderLoop();
-    } else {
-      renderFrame(performance.now());
-    }
-  }
-
-  function onVideoPlay() {
-    if (currentConfig.enabled && isNormalPlayerActive()) {
-      startRenderLoop();
-    }
-  }
-
-  function onVideoPause() {
-    stopRenderLoop();
-  }
-
-  function onVideoSeeked() {
-    renderFrame(performance.now());
-  }
-
-  function onVideoTimeUpdate() {
-    // 描画ループが何らかの理由で停止していた場合の自己修復
-    if (currentConfig.enabled && isNormalPlayerActive() && videoEl && !videoEl.paused && !isWatching) {
-      startRenderLoop();
-    }
-  }
-
-  // EDIT: 状態のチェックとクラス適用 (htmlおよびbody双方に付与して背景透過を徹底)
-  function checkPageStatus() {
-    createDOMElements();
-
-    const isNormal = isNormalPlayerActive();
-    const shouldBeActive = currentConfig.enabled && isNormal;
-
-    if (shouldBeActive) {
-      document.documentElement.classList.add('yt-backur-active');
-      document.body.classList.add('yt-backur-active');
-      applyConfigStyles();
-      bindVideoElement();
-
-      if (videoEl && !videoEl.paused && !videoEl.ended) {
-        startRenderLoop();
-      } else {
+    function startLoop() {
+        stopLoop();
+        if (!cfg.enabled || !isNormalPlayer() || !videoEl) return;
+        watching = true;
         renderFrame(performance.now());
-      }
-    } else {
-      document.documentElement.classList.remove('yt-backur-active');
-      document.body.classList.remove('yt-backur-active');
-      stopRenderLoop();
+        if ('requestVideoFrameCallback' in HTMLVideoElement.prototype && typeof videoEl.requestVideoFrameCallback === 'function') {
+            useVFC = true;
+            const cb = (now) => { if (!watching) return; renderFrame(now); loopId = videoEl.requestVideoFrameCallback(cb); };
+            loopId = videoEl.requestVideoFrameCallback(cb);
+        } else {
+            useVFC = false;
+            const loop = (now) => { if (!watching) return; renderFrame(now); loopId = requestAnimationFrame(loop); };
+            loopId = requestAnimationFrame(loop);
+        }
     }
-  }
 
-  // EDIT: イベントハンドラー登録
-  document.addEventListener('fullscreenchange', checkPageStatus);
-  document.addEventListener('webkitfullscreenchange', checkPageStatus);
-
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-      stopRenderLoop();
-    } else {
-      checkPageStatus();
+    function stopLoop() {
+        watching = false;
+        if (loopId === null) return;
+        useVFC && videoEl && typeof videoEl.cancelVideoFrameCallback === 'function'
+            ? videoEl.cancelVideoFrameCallback(loopId)
+            : cancelAnimationFrame(loopId);
+        loopId = null;
     }
-  });
 
-  // EDIT: YouTubeのSPA遷移イベント (yt-navigate-finish) を監視
-  window.addEventListener('yt-navigate-finish', () => {
-    setTimeout(checkPageStatus, 100);
-    setTimeout(checkPageStatus, 500);
-  });
+    const findVideo = () =>
+        document.querySelector('video.video-stream.html5-main-video') ||
+        document.querySelector('video.html5-main-video') ||
+        document.querySelector('#movie_player video') ||
+        document.querySelector('ytd-watch-flexy video') ||
+        document.querySelector('video');
 
-  // EDIT: 定期的な死活監視 (SPA遷移や広告切り替え時の復旧用)
-  setInterval(() => {
-    if (currentConfig.enabled && isNormalPlayerActive()) {
-      if (!containerEl || !document.getElementById('yt-backur-container')) {
-        createDOMElements();
-      }
-      bindVideoElement();
-      if (videoEl && !videoEl.paused && !isWatching) {
-        startRenderLoop();
-      }
+    const onPlay = () => cfg.enabled && isNormalPlayer() && startLoop();
+    const onPause = () => stopLoop();
+    const onSeeked = () => renderFrame(performance.now());
+    const onTime = () => { if (cfg.enabled && isNormalPlayer() && videoEl && !videoEl.paused && !watching) startLoop(); };
+
+    function bindVideo() {
+        const v = findVideo();
+        if (!v) return;
+        if (v === videoEl) {
+            if (!videoEl.paused && !videoEl.ended && !watching) startLoop();
+            return;
+        }
+        if (videoEl) {
+            ['play', 'playing', 'pause', 'ended', 'seeked', 'timeupdate'].forEach(e => {
+                videoEl.removeEventListener(e, { play: onPlay, playing: onPlay, pause: onPause, ended: onPause, seeked: onSeeked, timeupdate: onTime }[e]);
+            });
+        }
+        videoEl = v;
+        videoEl.addEventListener('play', onPlay);
+        videoEl.addEventListener('playing', onPlay);
+        videoEl.addEventListener('pause', onPause);
+        videoEl.addEventListener('ended', onPause);
+        videoEl.addEventListener('seeked', onSeeked);
+        videoEl.addEventListener('timeupdate', onTime);
+        videoEl.paused || videoEl.ended ? renderFrame(performance.now()) : startLoop();
     }
-  }, 1000);
 
-  // EDIT: ページ初期化
-  function init() {
-    createDOMElements();
-    initConfig();
+    function checkPage() {
+        createDOM();
+        const active = cfg.enabled && isNormalPlayer();
+        document.documentElement.classList.toggle('yt-backur-active', active);
+        document.body.classList.toggle('yt-backur-active', active);
+        if (active) {
+            applyStyles();
+            bindVideo();
+            videoEl && !videoEl.paused && !videoEl.ended ? startLoop() : renderFrame(performance.now());
+        } else {
+            stopLoop();
+        }
+    }
 
-    const observer = new MutationObserver(() => {
-      if (!containerEl || !document.getElementById('yt-backur-container')) {
-        createDOMElements();
-      }
-      if (!videoEl || !isWatching) {
-        bindVideoElement();
-      }
-      checkPageStatus();
+    // EDIT: ストレージ変更時にloadConfigで設定を再読み込み
+    chrome.storage.onChanged.addListener((changes, area) => {
+        if (area !== 'local') return;
+        if (!('youtubeBackur' in changes || 'youtubeBackurConfigs' in changes)) return;
+        loadConfig(() => { applyStyles(); checkPage(); });
     });
 
-    observer.observe(document.body || document.documentElement, {
-      childList: true,
-      subtree: true
-    });
+    document.addEventListener('fullscreenchange', checkPage);
+    document.addEventListener('webkitfullscreenchange', checkPage);
+    document.addEventListener('visibilitychange', () => document.hidden ? stopLoop() : checkPage());
+    window.addEventListener('yt-navigate-finish', () => { setTimeout(checkPage, 100); setTimeout(checkPage, 500); });
+    setInterval(() => {
+        if (!cfg.enabled || !isNormalPlayer()) return;
+        if (!document.getElementById('yt-backur-container')) createDOM();
+        bindVideo();
+        if (videoEl && !videoEl.paused && !watching) startLoop();
+    }, 1000);
 
-    checkPageStatus();
-  }
+    function init() {
+        createDOM();
+        loadConfig(checkPage);
+        const observer = new MutationObserver(() => {
+            if (!document.getElementById('yt-backur-container')) createDOM();
+            if (!videoEl || !watching) bindVideo();
+            checkPage();
+        });
+        observer.observe(document.body || document.documentElement, { childList: true, subtree: true });
+    }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+    document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', init) : init();
 })();
