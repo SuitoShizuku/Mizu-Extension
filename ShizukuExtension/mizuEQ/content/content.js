@@ -150,7 +150,8 @@
 
   const styleLink = document.createElement('link');
   styleLink.rel = 'stylesheet';
-  styleLink.href = chrome.runtime.getURL('styles.css');
+  // EDIT: 親拡張機能の階層に合わせてパスを修正
+  styleLink.href = chrome.runtime.getURL('ShizukuExtension/mizuEQ/styles.css');
   shadow.appendChild(styleLink);
 
   // ============================================================

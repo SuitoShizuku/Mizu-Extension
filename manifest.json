@@ -5,7 +5,11 @@
   "manifest_version": 3,
   "permissions": [
     "sidePanel",
-    "storage"
+    "storage",
+    "tabCapture",
+    "offscreen",
+    "activeTab",
+    "tabs"
   ],
   "action": {
     "default_title": "コンパクト設定を開く",
@@ -17,9 +21,19 @@
   "background": {
     "service_worker": "background.js"
   },
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["ShizukuExtension/mizuEQ/styles.css"],
+      "matches": ["<all_urls>"]
+    }
+  ],
   "author": {
     "email": "mochimizu@suitomisu.com"
   },
+  "homepage_url": "https://suitomizu.com/",
   "short_name": "MizuX",
   "content_scripts": [
     {
@@ -34,6 +48,12 @@
       "matches": [ "https://www.youtube.com/watch*" ],
       "js": [ "ShizukuExtension/youtubeBackur/content.js" ],
       "css": [ "ShizukuExtension/youtubeBackur/content.css" ]
+    },
+    {
+      "matches": [ "<all_urls>" ],
+      "js": [ "ShizukuExtension/mizuEQ/content/content.js" ],
+      "css": [ "ShizukuExtension/mizuEQ/styles.css" ],
+      "run_at": "document_idle"
     }
   ]
 }

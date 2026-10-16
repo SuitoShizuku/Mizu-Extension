@@ -47,7 +47,7 @@ async function ensureOffscreen() {
       if (contexts.length === 0) {
         try {
           await chrome.offscreen.createDocument({
-            url: 'offscreen.html',
+            url: 'ShizukuExtension/mizuEQ/offscreen.html',
             reasons: ['USER_MEDIA'],
             justification: 'Tab audio capture and EQ processing'
           });

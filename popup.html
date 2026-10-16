@@ -19,6 +19,29 @@
       border-radius: 5px;
       user-select: none;
     }
+    /* EDIT: フォーム要素のスタイル */
+    select, textarea {
+      width: 100%;
+      padding: 6px;
+      margin-top: 4px;
+      margin-bottom: 8px;
+      box-sizing: border-box;
+      background-color: #ffffff20;
+      color: #fff;
+      border: 1px solid #ffffff40;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    select option {
+      background-color: #000e1c;
+      color: #fff;
+    }
+    label {
+      display: block;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #ccc;
+    }
   </style>
 </head>
 <body>
@@ -27,6 +50,19 @@
   <label>
     <input type="checkbox" id="quickToggle"> クイック設定
   </label>
+  <button id="loadEQ">EQをロード/アンロード</button>
+
+  <!-- ADD: mizuEQ描画品質設定 -->
+  <label for="eqQuality">EQ描画品質</label>
+  <select id="eqQuality">
+    <option value="8">8 (標準)</option>
+    <option value="16">16 (高品質)</option>
+  </select>
+
+  <!-- ADD: mizuEQ対象URLパターン設定 -->
+  <label for="eqUrlPatterns">対象URLパターン (改行区切り)</label>
+  <textarea id="eqUrlPatterns" rows="2" placeholder="https://www.youtube.com/watch?v=*"></textarea>
+
   <hr>
   <!-- ADD: フル設定パネル（サイドパネル）を開くボタン -->
   <button id="openSidePanel">フル設定をサイドパネルで開く</button>

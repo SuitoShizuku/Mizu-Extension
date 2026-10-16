@@ -95,3 +95,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     chrome.sidePanel.open({ tabId });
   }
 });
+
+// EQ
+importScripts('ShizukuExtension/mizuEQ/background.js')
