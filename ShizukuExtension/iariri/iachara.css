@@ -1,0 +1,10 @@
+.iariri_popup{
+    background-color: rgb(39, 98, 158);
+}
+:hover .iariri_popup{
+    color: rgb(170, 170, 170);
+}
+
+.over_value{
+    color: red
+}

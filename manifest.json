@@ -58,6 +58,11 @@
     {
       "matches": [ "https://www.densuke.biz/event*", "https://www.densuke.biz/edit2?cd=*", "https://densuke.biz/event*", "https://densuke.biz/edit2?cd=*"],
       "js": [ "densuke.js" ]
+    },
+    {
+      "matches": [ "https://iachara.com/*" ],
+      "js": [ "iachara.js" ],
+      "css": [ "ShizukuExtension/iariri/iachara.css" ]
     }
   ]
 }

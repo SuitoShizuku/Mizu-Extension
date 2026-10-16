@@ -34,6 +34,11 @@ async function setNof(texts) {
     setInitData('gfDelKey', 'gigafileDelKey', 'checkbox', false)
     
     setInitData('dsShurasuke', 'densukeShurasuke', 'checkbox', true)
+    
+    setInitData('iaOverflowHighlight', 'iacharaOverflowHighligh', 'checkbox', true)
+    setInitData('iaSkillHighlight', 'iacharaSkillHighlight', 'checkbox', true)
+    setInitData('iaMemoCount', 'iacharaMemoCount', 'checkbox', true)
+    setInitData('iaPopoutButton', 'iacharaPopupButton', 'checkbox', true)
 
     // 初期化ボタン
     document.getElementById("initializeCache").addEventListener('click', async (event) => {
