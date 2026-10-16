@@ -32,6 +32,8 @@ async function setNof(texts) {
     setInitData('gfFileManager', 'gigafileFileManager', 'checkbox', true)
     setInitData('gfCopy', 'gigafileCopy', 'checkbox', true)
     setInitData('gfDelKey', 'gigafileDelKey', 'checkbox', false)
+    
+    setInitData('dsShurasuke', 'densukeShurasuke', 'checkbox', true)
 
     // 初期化ボタン
     document.getElementById("initializeCache").addEventListener('click', async (event) => {
