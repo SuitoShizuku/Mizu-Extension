@@ -54,6 +54,10 @@
       "js": [ "ShizukuExtension/mizuEQ/content/content.js" ],
       "css": [ "ShizukuExtension/mizuEQ/styles.css" ],
       "run_at": "document_idle"
+    },
+    {
+      "matches": [ "https://www.densuke.biz/event*", "https://www.densuke.biz/edit2?cd=*", "https://densuke.biz/event*", "https://densuke.biz/edit2?cd=*"],
+      "js": [ "densuke.js" ]
     }
   ]
 }
