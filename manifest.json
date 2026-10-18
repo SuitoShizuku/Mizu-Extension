@@ -11,6 +11,13 @@
     "activeTab",
     "tabs"
   ],
+  "icons": {
+    "32": "assets/icon/x32.png",
+    "64": "assets/icon/x64.png",
+    "128": "assets/icon/x128.png",
+    "256": "assets/icon/x256.png",
+    "512": "assets/icon/x512.png"
+  },
   "action": {
     "default_title": "コンパクト設定を開く",
     "default_popup": "popup.html"
