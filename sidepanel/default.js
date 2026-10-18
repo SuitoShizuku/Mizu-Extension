@@ -32,11 +32,11 @@ async function setNof(texts) {
     setInitData('gfFileManager', 'gigafileFileManager', 'checkbox', true)
     setInitData('gfCopy', 'gigafileCopy', 'checkbox', true)
     setInitData('gfDelKey', 'gigafileDelKey', 'checkbox', false)
-    
+
     setInitData('dsShurasuke', 'densukeShurasuke', 'checkbox', true)
-    
-    setInitData('iaOverflowHighlight', 'iacharaOverflowHighligh', 'checkbox', true)
-    setInitData('iaSkillHighlight', 'iacharaSkillHighlight', 'checkbox', true)
+
+    setInitData('iaOverflowHighlight', 'iacharaOverflowHighlight', 'checkbox', true, "#FF0000")
+    setInitData('iaSkillHighlight', 'iacharaSkillHighlight', 'checkbox', true, "#DEA5A4")
     setInitData('iaMemoCount', 'iacharaMemoCount', 'checkbox', true)
     setInitData('iaPopoutButton', 'iacharaPopupButton', 'checkbox', true)
 
@@ -67,16 +67,32 @@ async function setNof(texts) {
  * @param {string} key ストレージのキー
  * @param {'checkbox' | 'value' | 'slider'} type ストレージの型
  * @param {any} defaultValue デフォルトの値
+ * @param {any} defaultProperty デフォルトのプロパティ
  */
-async function setInitData(elmId, key, type, defaultValue) {
+async function setInitData(elmId, key, type, defaultValue, defaultProperty = null) {
     let AllData = await chrome.storage.local.get(null);
     let elm = document.getElementById(elmId);
     if (type == 'checkbox') {
+        const inlineProp = elm.parentElement.parentElement.nextElementSibling ?? null
         elm.checked = AllData[key] ?? defaultValue;
         elm.addEventListener('click', async (event) => {
             const isChecked = (event.target).checked;
             await chrome.storage.local.set({ [key]: isChecked })
+            if (inlineProp !== null) {
+                if (elm.checked) {
+                    inlineProp.disabled = false;
+                } else {
+                    inlineProp.disabled = true;
+                }
+            }
         });
+        if (inlineProp !== null){
+            inlineProp.value = AllData[`${key}Property`] ?? defaultProperty;
+            inlineProp.addEventListener('change', async (event) => {
+            const value = (event.target).value;
+            await chrome.storage.local.set({ [`${key}Property`]: value })
+        });
+        }
     } else if (type == 'value') {
         elm.value = AllData[key] ?? defaultValue;
         elm.addEventListener('change', async (event) => {
@@ -105,7 +121,7 @@ async function setInitData_Slider(elmIdValue, elmIdSlider, key, defaultValue, ob
 
     elmValue.value = value;
     elmSlider.value = value;
-    
+
     // value変更時の処理
     elmValue.addEventListener('change', async (event) => {
         const value = (event.target).value;
@@ -118,15 +134,15 @@ async function setInitData_Slider(elmIdValue, elmIdSlider, key, defaultValue, ob
         elmValue.value = value;
         await chrome.storage.local.set({ [key]: value })
     });
-    
+
     // valueをホイールスクロールでも動くようにする
     elmValue.addEventListener('wheel', async (event) => {
         event.preventDefault();
         let currentValue = Number((event.target).value);
         const step = Number(elmIdValue.step) || 1;
-        if(event.deltaY > 0) {
+        if (event.deltaY > 0) {
             currentValue -= step;
-        }else if(event.deltaY < 0) {
+        } else if (event.deltaY < 0) {
             currentValue += step;
         }
         elmValue.value = currentValue;
@@ -138,9 +154,9 @@ async function setInitData_Slider(elmIdValue, elmIdSlider, key, defaultValue, ob
         event.preventDefault();
         let currentValue = Number((event.target).value);
         const step = Number(elmIdValue.step) || 1;
-        if(event.deltaY > 0) {
+        if (event.deltaY > 0) {
             currentValue -= step;
-        }else if(event.deltaY < 0) {
+        } else if (event.deltaY < 0) {
             currentValue += step;
         }
         elmValue.value = currentValue;
