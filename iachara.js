@@ -66,8 +66,14 @@ function firstLoad() {
     popups.style.borderRadius = '4px'
     popupsbtn.className = 'button_sideButton__lWcU8 iariri_popup'
     popupsbtn.id = 'iariri_popup'
-    popupsbtn.style.color = '#a0a0a0'
-    popupsbtn.style.borderRadius = '4px'
+    // popupsbtn.style.color = '#a0a0a0'
+    // popupsbtn.style.borderRadius = '4px'
+    popupsbtn.style.borderRadius = '5px';
+    popupsbtn.style.borderWidth = '0';
+    popupsbtn.style.backgroundColor = '#303b47';
+    popupsbtn.style.color = '#fff';
+    popupsbtn.style.fontWeight = 'bold';
+    popupsbtn.style.cursor = 'pointer';
     popupsbtn.textContent = 'ポップアップする'
     popups.appendChild(popupsbtn)
     sidebar.appendChild(popups)

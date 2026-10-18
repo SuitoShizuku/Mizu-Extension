@@ -130,6 +130,7 @@
     sidepanelButton.style.color = '#fff';
     sidepanelButton.style.fontWeight = 'bold';
     sidepanelButton.style.margin = '16px 0';
+    sidepanelButton.style.cursor = 'pointer';
     sidepanelButton.textContent = "ファイルマネージャーを表示"
     sidepanelButton.onclick = (event) => {
         chrome.runtime.sendMessage({ action: 'openSidePanel' });

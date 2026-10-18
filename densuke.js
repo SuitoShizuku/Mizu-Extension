@@ -8,7 +8,16 @@
         let fill_btn = document.createElement('button', 'id=fillbtn')
         fill_btn.innerText = 'この月を一括で追加'
         fill_btn.id = 'fillbtn'
-        fill_btn.style = 'width: 314px;margin-left:11px;border-color:#3030f0;background-color:#ddf;font-weight:bold'
+        // fill_btn.style = 'width: 314px;margin-left:11px;border-color:#3030f0;background-color:#ddf;font-weight:bold'
+        fill_btn.style.width = '314px';
+        fill_btn.style.height = '35px';
+        fill_btn.style.borderRadius = '5px';
+        fill_btn.style.borderWidth = '0';
+        fill_btn.style.backgroundColor = '#303b47';
+        fill_btn.style.color = '#fff';
+        fill_btn.style.fontWeight = 'bold';
+        fill_btn.style.marginLeft = '11px';
+        fill_btn.style.cursor = 'pointer';
         fill_btn.addEventListener('click', () => {
             // 開いているカレンダーの月を取得し、日程計算後記入
             let calendars = document.querySelectorAll('.calheader')
