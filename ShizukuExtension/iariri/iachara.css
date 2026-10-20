@@ -2,12 +2,17 @@
     border-radius: 4px;
     color: rgb(255, 255, 255);
     /* border: 1px solid rgb(237, 84, 79); */
-    border: 1px solid #000e1c;
+    border: 1px solid #5072ed;
     max-height: 3em;
     cursor: pointer;
     /* background-color: rgb(237, 84, 79); */
-    background-color: #000e1c;
+    background-color: #5072ed;
+    padding: calc(-1px + 0.5rem) 1em;
 }
-:hover .iariri_popup{
+#iariri_popup button {
+    background-color: none;
+    border: 0;
+}
+:hover #iariri_popup button{
     color: rgb(170, 170, 170);
 }
