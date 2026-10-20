@@ -43,25 +43,30 @@
       font-size: 12px;
       color: #ccc;
     }
+    .inlineSelect {
+      display: flex;
+      font-size: 14px;
+      align-items:baseline;
+    }
+    .inlineSelect select {
+      width:170px;
+      margin-left: 13px;
+    }
   </style>
 </head>
 <body>
   <h3>簡易設定</h3>
-  <!-- ADD: 簡易設定用のコントロール例 -->
-  <label>
-    <input type="checkbox" id="quickToggle"> クイック設定
-  </label>
+
+  <hr>
+  <h4>EQ</h4>
   <button id="loadEQ">EQを開始</button>
+  <label for="eqQuality" class="inlineSelect">描画品質
+  <select id="eqQuality" class="inlineSelect">
+    <option value="8">x8 (標準)</option>
+    <option value="16">x16 (高品質)</option>
+  </select></label>
 
-  <!-- ADD: mizuEQ描画品質設定 -->
-  <label for="eqQuality">EQ描画品質</label>
-  <select id="eqQuality">
-    <option value="8">8 (標準)</option>
-    <option value="16">16 (高品質)</option>
-  </select>
-
-  <!-- ADD: mizuEQ対象URLパターン設定 -->
-  <label for="eqUrlPatterns">対象URLパターン (改行区切り)</label>
+  <label for="eqUrlPatterns">自動再開URLパターン (改行で区切り)</label>
   <textarea id="eqUrlPatterns" rows="2" wrap="off" placeholder="https://www.youtube.com/watch?v=*"></textarea>
 
   <hr>

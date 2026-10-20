@@ -57,10 +57,10 @@ function updateButtonUI(button, isCapturing, isPowered) {
     button.textContent = 'EQを開始';
     button.style.backgroundColor = '#ffffff50';
   } else if (isPowered) {
-    button.textContent = 'EQを停止';
+    button.textContent = 'EQを停止(Shiftで完全に停止)';
     button.style.backgroundColor = '#ff4d4d80';
   } else {
-    button.textContent = 'EQを再開';
+    button.textContent = 'EQを再開(Shiftで完全に停止)';
     button.style.backgroundColor = '#ffffff50';
   }
 }
