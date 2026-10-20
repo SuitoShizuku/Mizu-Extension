@@ -208,6 +208,39 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
+  // ADD: ポップアップからの明示的なキャプチャ停止
+  if (message.type === 'STOP_EQ') {
+    const tabId = message.tabId;
+    if (!tabId) {
+      sendResponse({ stopped: false, error: 'タブIDを取得できませんでした' });
+      return false;
+    }
+    stopCapture(tabId)
+      .then(() => sendResponse({ stopped: true, capturing: false, tabId }))
+      .catch(e => sendResponse({ stopped: false, error: e.message, tabId }));
+    return true;
+  }
+
+  // ADD: ポップアップからの明示的なキャプチャ開始
+  if (message.type === 'START_EQ') {
+    const tabId = message.tabId;
+    if (!tabId) {
+      sendResponse({ started: false, error: 'タブIDを取得できませんでした' });
+      return false;
+    }
+    const streamIdResultPromise = requestTabStreamId(tabId);
+    startCapture(tabId, streamIdResultPromise).then(() => {
+      const session = activeSessions.get(tabId);
+      sendResponse({
+        started: true,
+        capturing: session?.active === true || session?.starting === true,
+        starting: session?.starting === true,
+        tabId
+      });
+    }).catch(e => sendResponse({ started: false, error: e.message, tabId }));
+    return true;
+  }
+
   if (message.type === 'TOGGLE_EQ') {
     const tabId = message.tabId || sender.tab?.id;
     if (!tabId) {

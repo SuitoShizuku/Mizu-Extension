@@ -858,6 +858,7 @@
     }
     if (message.type === 'SHOW_EQ_WINDOW') {
       if (tabId) {
+        centerEQWindow();  // ADD: 再表示時に中央配置
         showEQWindow();
         chrome.runtime.sendMessage({ type: 'REQUEST_SPECTRUM', tabId });
       }
@@ -872,6 +873,7 @@
 
   function activateEQ(activatedTabId) {
     tabId = activatedTabId;
+    if (!isVisible) centerEQWindow();  // ADD: 非表示状態からの起動時に中央配置
     showEQWindow();
     sendEQParams({ bands, inputGain, outputGain, limiterThreshold, limiterEnabled });
     chrome.runtime.sendMessage({ type: 'REQUEST_SPECTRUM', tabId });
@@ -1774,6 +1776,14 @@
   // ============================================================
   // EDIT: ウインドウ表示制御
   // ============================================================
+
+  // ADD: EQウィンドウを画面中央に再配置する
+  function centerEQWindow() {
+    const w = isMiniMode ? MINI_WIDTH : FULL_WIDTH;
+    const h = isMiniMode ? MINI_HEIGHT : FULL_HEIGHT;
+    winX = Math.max(0, Math.round((window.innerWidth - w) / 2));
+    winY = Math.max(0, Math.round((window.innerHeight - h) / 2));
+  }
 
   function showEQWindow() {
     isVisible = true;

@@ -51,10 +51,18 @@ function saveUrlPatterns(patterns) {
   return chrome.storage.local.set({ [URL_PATTERNS_KEY]: validPatterns });
 }
 
-// ADD: ボタン表示の更新
-function updateButtonUI(button, isCapturing) {
-  button.textContent = isCapturing ? 'EQを停止' : 'EQを開始';
-  button.style.backgroundColor = isCapturing ? '#ff4d4d80' : '#ffffff50';
+// EDIT: ボタン表示の更新 (powered状態で管理)
+function updateButtonUI(button, isCapturing, isPowered) {
+  if (!isCapturing) {
+    button.textContent = 'EQを開始';
+    button.style.backgroundColor = '#ffffff50';
+  } else if (isPowered) {
+    button.textContent = 'EQを停止';
+    button.style.backgroundColor = '#ff4d4d80';
+  } else {
+    button.textContent = 'EQを再開';
+    button.style.backgroundColor = '#ffffff50';
+  }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -92,23 +100,48 @@ document.addEventListener('DOMContentLoaded', async () => {
   ]);
 
   captureActive = status?.capturing === true;
+  // EDIT: powered状態で停止/再開を区別 (EQ電源ボタンと同じ軸)
+  let eqPowered = status?.powered !== false;
   if (button) {
     button.disabled = prepared?.ready !== true;
-    updateButtonUI(button, captureActive);
+    updateButtonUI(button, captureActive, eqPowered);
 
-    // EDIT: クリック直後に即座にTOGGLE_EQを送信(ユーザーアクション制限対策)
+    // EDIT: 未キャプチャ→START_EQ、キャプチャ済み→TOGGLE_EQ (バイパス切り替え=電源ボタンと同じ動作)
     button.addEventListener('click', () => {
       if (activeTabId === null) return;
 
-      chrome.runtime.sendMessage({
-        type: 'TOGGLE_EQ',
-        tabId: activeTabId,
-        captureActive
-      }, response => {
-        if (chrome.runtime.lastError || response?.error) return;
-        captureActive = response?.capturing === true || response?.starting === true;
-        updateButtonUI(button, captureActive);
-      });
+      if (!captureActive) {
+        // EDIT: 開始 (キャプチャ未開始)
+        chrome.runtime.sendMessage({
+          type: 'START_EQ',
+          tabId: activeTabId
+        }, response => {
+          if (chrome.runtime.lastError || response?.error) return;
+          captureActive = response?.capturing === true || response?.starting === true;
+          eqPowered = true;
+          updateButtonUI(button, captureActive, eqPowered);
+          // ADD: EQウィンドウを表示・中央配置させる
+          if (captureActive || response?.starting) {
+            chrome.runtime.sendMessage({
+              type: 'SHOW_EQ_WINDOW',
+              tabId: activeTabId
+            });
+          }
+        });
+      } else {
+        // EDIT: 停止/再開 → TOGGLE_EQ (EQ電源ボタンと同一動作: バイパス切り替え)
+        // ウィンドウは非表示にならず、EQ処理のみ ON/OFF する
+        chrome.runtime.sendMessage({
+          type: 'TOGGLE_EQ',
+          tabId: activeTabId,
+          captureActive
+        }, response => {
+          if (chrome.runtime.lastError || response?.error) return;
+          // EDIT: response.active が新しいpowered状態
+          eqPowered = response?.active === true;
+          updateButtonUI(button, captureActive, eqPowered);
+        });
+      }
     });
   }
 });

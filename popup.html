@@ -31,6 +31,7 @@
       border: 1px solid #ffffff40;
       border-radius: 4px;
       font-size: 13px;
+      resize: vertical;
     }
     select option {
       background-color: #000e1c;
@@ -50,7 +51,7 @@
   <label>
     <input type="checkbox" id="quickToggle"> クイック設定
   </label>
-  <button id="loadEQ">EQをロード/アンロード</button>
+  <button id="loadEQ">EQを開始</button>
 
   <!-- ADD: mizuEQ描画品質設定 -->
   <label for="eqQuality">EQ描画品質</label>
@@ -61,7 +62,7 @@
 
   <!-- ADD: mizuEQ対象URLパターン設定 -->
   <label for="eqUrlPatterns">対象URLパターン (改行区切り)</label>
-  <textarea id="eqUrlPatterns" rows="2" placeholder="https://www.youtube.com/watch?v=*"></textarea>
+  <textarea id="eqUrlPatterns" rows="2" wrap="off" placeholder="https://www.youtube.com/watch?v=*"></textarea>
 
   <hr>
   <!-- ADD: フル設定パネル（サイドパネル）を開くボタン -->
