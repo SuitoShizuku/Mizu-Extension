@@ -106,8 +106,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     button.disabled = prepared?.ready !== true;
     updateButtonUI(button, captureActive, eqPowered);
 
-    // EDIT: 未キャプチャ→START_EQ、キャプチャ済み→TOGGLE_EQ (バイパス切り替え=電源ボタンと同じ動作)
-    button.addEventListener('click', () => {
+    // EDIT: 未キャプチャ→START_EQ、キャプチャ中+Shiftクリック→STOP_EQ(完全停止)、キャプチャ中通常クリック→TOGGLE_EQ
+    button.addEventListener('click', (event) => {
       if (activeTabId === null) return;
 
       if (!captureActive) {
@@ -127,6 +127,17 @@ document.addEventListener('DOMContentLoaded', async () => {
               tabId: activeTabId
             });
           }
+        });
+      } else if (event.shiftKey) {
+        // ADD: Shift+クリック時はTabCaptureも含めて完全停止し、ボタンを「EQを開始」に戻す
+        chrome.runtime.sendMessage({
+          type: 'STOP_EQ',
+          tabId: activeTabId
+        }, response => {
+          if (chrome.runtime.lastError || response?.error) return;
+          captureActive = false;
+          eqPowered = false;
+          updateButtonUI(button, captureActive, eqPowered);
         });
       } else {
         // EDIT: 停止/再開 → TOGGLE_EQ (EQ電源ボタンと同一動作: バイパス切り替え)
