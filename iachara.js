@@ -1,4 +1,6 @@
 async function main() {
+    insertBtn()
+
     let memoField = document.getElementsByTagName('textarea')
     for (let i = 0; i < memoField.length; i++) {
         let element = memoField.item(i);
@@ -58,13 +60,14 @@ function makeLengthCounter(params2) {
     return cbox
 }
 
-function firstLoad() {
-    let footer = document.getElementsByClassName('MuiBox-root css-xgi2r').item(0)
+function insertBtn() {
+    let footer = document.getElementsByClassName('MuiBox-root css-xgi2r').item(0) ?? document.getElementsByClassName('MuiBox-root css-uwwqev').item(0) ?? null
+    if (footer == null || footer.getElementsByClassName('iariri_popup').item(0) !== null) return;
     let popups = document.createElement('div')
     let popupsbtn = document.createElement('div')
     // popups.style.backgroundColor = 'transparent'
     // popups.style.borderRadius = '4px'
-    // popupsbtn.className = 'button_sideButton__lWcU8 iariri_popup'
+    popupsbtn.className = 'iariri_popup'
     popups.id = 'iariri_popup'
     // popupsbtn.style.color = '#a0a0a0'
     // popupsbtn.style.borderRadius = '4px'
@@ -77,7 +80,7 @@ function firstLoad() {
     footer.appendChild(popups)
 }
 
-/**
+/** 
  * @type { MutationObserver }
  */
 const observer = new MutationObserver(async () => {
@@ -92,7 +95,6 @@ const observer = new MutationObserver(async () => {
 
 (async () => {
     setTimeout(() => {
-        firstLoad()
         observer.observe(document.body, {
             childList: false,
             subtree: true,
