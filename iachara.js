@@ -59,28 +59,22 @@ function makeLengthCounter(params2) {
 }
 
 function firstLoad() {
-    let sidebar = document.getElementsByClassName('edit_mainContainer__URa5B').item(0).getElementsByTagName('aside').item(0)
+    let sidebar = document.getElementsByClassName('MuiBox-root').item(0)
     let popups = document.createElement('div')
     let popupsbtn = document.createElement('button')
-    popups.style.backgroundColor = 'transparent'
-    popups.style.borderRadius = '4px'
-    popupsbtn.className = 'button_sideButton__lWcU8 iariri_popup'
-    popupsbtn.id = 'iariri_popup'
+    // popups.style.backgroundColor = 'transparent'
+    // popups.style.borderRadius = '4px'
+    // popupsbtn.className = 'button_sideButton__lWcU8 iariri_popup'
+    popups.id = 'iariri_popup'
     // popupsbtn.style.color = '#a0a0a0'
     // popupsbtn.style.borderRadius = '4px'
-    popupsbtn.style.borderRadius = '5px';
-    popupsbtn.style.borderWidth = '0';
-    popupsbtn.style.backgroundColor = '#303b47';
-    popupsbtn.style.color = '#fff';
-    popupsbtn.style.fontWeight = 'bold';
-    popupsbtn.style.cursor = 'pointer';
     popupsbtn.textContent = 'ポップアップする'
-    popups.appendChild(popupsbtn)
-    sidebar.appendChild(popups)
-    document.getElementById('iariri_popup').onclick = (function (){
+    popupsbtn.onclick = (function (){
         const urls = location.href.split('/')
         window.open(`https://iachara.com/view/${urls[urls.length-1]}`, '', 'location=no, width=600, height=800');
     })
+    popups.appendChild(popupsbtn)
+    sidebar.appendChild(popups)
 }
 
 (async () => {
@@ -98,5 +92,5 @@ function firstLoad() {
             if (loadCount == 1 && settings.iacharaPopupButton) firstLoad()
             main(settings)
         }
-    }, 1000);
+    }, 5000);
 })();
