@@ -29,6 +29,8 @@ async function setNof(texts) {
     setInitData_Slider('ytBackurConfigsBrightness', 'ytBackurConfigsBrightnessRange', 'youtubeBackurConfigsBrightness', 70, 'brightness')
     setInitData_Slider('ytBackurConfigsOpacity', 'ytBackurConfigsOpacityRange', 'youtubeBackurConfigsOpacity', 85, 'opacity')
 
+    setInitData('ytCopyCustomize', 'youtubeCopyCustomize', 'checkbox', true, "raw")
+
     setInitData('gfFileManager', 'gigafileFileManager', 'checkbox', true)
     setInitData('gfCopy', 'gigafileCopy', 'checkbox', true)
     setInitData('gfDelKey', 'gigafileDelKey', 'checkbox', false)
