@@ -4,7 +4,8 @@
   "description": "しずくの必要な機能を集めた拡張機能",
   "main": "background.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "pack": "node packed.js"
   },
   "repository": {
     "type": "git",
@@ -19,5 +20,10 @@
   "homepage": "https://github.com/SuitoShizuku/Mizu-Extension#readme",
   "devDependencies": {
     "@types/chrome": "^0.3.5"
+  },
+  "dependencies": {
+    "adm-zip": "^0.6.1",
+    "fs": "^0.0.1-security",
+    "picomatch": "^4.0.7"
   }
 }
