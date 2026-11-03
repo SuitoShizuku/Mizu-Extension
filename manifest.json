@@ -34,7 +34,7 @@
   "web_accessible_resources": [
     {
       "resources": ["ShizukuExtension/mizuEQ/styles.css"],
-      "matches": ["<all_urls>"]
+      "matches": ["*://*/*"]
     }
   ],
   "author": {
