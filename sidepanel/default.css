@@ -121,9 +121,19 @@ button {
   border-radius: 0;
   cursor: pointer;
   margin-left: 8px;
+  display: inline;
 }
 .inlineProperty:disabled{
   cursor: auto;
+}
+select.inlineProperty{
+    height: 24px;
+    margin-left: auto;
+    width: 10.4em;
+}
+select.inlineProperty>option{
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 /* EDIT: ON状態のスタイル（背景を青にし、丸を右へ移動） */
