@@ -2,3 +2,4 @@ node_modules/
 old_*
 ._*
 dev/
+*.zip
