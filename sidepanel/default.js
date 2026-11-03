@@ -29,7 +29,7 @@ async function setNof(texts) {
     setInitData_Slider('ytBackurConfigsBrightness', 'ytBackurConfigsBrightnessRange', 'youtubeBackurConfigsBrightness', 70, 'brightness')
     setInitData_Slider('ytBackurConfigsOpacity', 'ytBackurConfigsOpacityRange', 'youtubeBackurConfigsOpacity', 85, 'opacity')
 
-    setInitData('ytCopyCustomize', 'youtubeCopyCustomize', 'checkbox', true, "raw")
+    setInitData('ytCopyCustomize', 'youtubeCopyCustomize', 'checkbox', true, "remove_si")
 
     setInitData('gfFileManager', 'gigafileFileManager', 'checkbox', true)
     setInitData('gfCopy', 'gigafileCopy', 'checkbox', true)
@@ -89,6 +89,7 @@ async function setInitData(elmId, key, type, defaultValue, defaultProperty = nul
             }
         });
         if (inlineProp !== null){
+            inlineProp.disabled = !Boolean(AllData[key] ?? defaultValue);
             inlineProp.value = AllData[`${key}Property`] ?? defaultProperty;
             inlineProp.addEventListener('change', async (event) => {
             const value = (event.target).value;
